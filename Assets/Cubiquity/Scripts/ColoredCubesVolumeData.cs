@@ -9,9 +9,9 @@ namespace Cubiquity
 	[System.Serializable]
 	public sealed class ColoredCubesVolumeData : VolumeData
 	{		
-		public static ColoredCubesVolumeData CreateFromVoxelDatabase(string pathToVoxelDatabase)
+		public static ColoredCubesVolumeData CreateFromVoxelDatabase(Paths basePath, string relativePathToVoxelDatabase)
 		{
-			return CreateFromVoxelDatabase<ColoredCubesVolumeData>(pathToVoxelDatabase);
+			return CreateFromVoxelDatabase<ColoredCubesVolumeData>(basePath, relativePathToVoxelDatabase);
 		}
 		
 		public static ColoredCubesVolumeData CreateEmptyVolumeData(Region region)
@@ -19,9 +19,9 @@ namespace Cubiquity
 			return CreateEmptyVolumeData<ColoredCubesVolumeData>(region);
 		}
 		
-		public static ColoredCubesVolumeData CreateEmptyVolumeData(Region region, string pathToCreateVoxelDatabase)
+		public static ColoredCubesVolumeData CreateEmptyVolumeData(Region region, Paths basePath, string relativePathToVoxelDatabase)
 		{
-			return CreateEmptyVolumeData<ColoredCubesVolumeData>(region, pathToCreateVoxelDatabase);
+			return CreateEmptyVolumeData<ColoredCubesVolumeData>(region, basePath, relativePathToVoxelDatabase);
 		}
 		
 		public QuantizedColor GetVoxel(int x, int y, int z)
@@ -51,15 +51,15 @@ namespace Cubiquity
 			}
 		}
 		
-		protected override void InitializeEmptyCubiquityVolume()
+		protected override void InitializeEmptyCubiquityVolume(Region region)
 		{				
 			// This function might get called multiple times. E.g the user might call it striaght after crating the volume (so
 			// they can add some initial data to the volume) and it might then get called again by OnEnable(). Handle this safely.
-			if((volumeHandle == null) && (pathToVoxelDatabase != null))
+			if(volumeHandle == null)
 			{
 				// Create an empty region of the desired size.
-				volumeHandle = CubiquityDLL.NewEmptyColoredCubesVolume(enclosingRegion.lowerCorner.x, enclosingRegion.lowerCorner.y, enclosingRegion.lowerCorner.z,
-					enclosingRegion.upperCorner.x, enclosingRegion.upperCorner.y, enclosingRegion.upperCorner.z, pathToVoxelDatabase, DefaultBaseNodeSize);
+				volumeHandle = CubiquityDLL.NewEmptyColoredCubesVolume(region.lowerCorner.x, region.lowerCorner.y, region.lowerCorner.z,
+					region.upperCorner.x, region.upperCorner.y, region.upperCorner.z, fullPathToVoxelDatabase, DefaultBaseNodeSize);
 			}
 		}
 
@@ -67,10 +67,10 @@ namespace Cubiquity
 		{				
 			// This function might get called multiple times. E.g the user might call it striaght after crating the volume (so
 			// they can add some initial data to the volume) and it might then get called again by OnEnable(). Handle this safely.
-			if((volumeHandle == null) && (pathToVoxelDatabase != null))
+			if(volumeHandle == null)
 			{
 				// Create an empty region of the desired size.
-				volumeHandle = CubiquityDLL.NewColoredCubesVolumeFromVDB(pathToVoxelDatabase, DefaultBaseNodeSize);
+				volumeHandle = CubiquityDLL.NewColoredCubesVolumeFromVDB(fullPathToVoxelDatabase, DefaultBaseNodeSize);
 			}
 		}
 		

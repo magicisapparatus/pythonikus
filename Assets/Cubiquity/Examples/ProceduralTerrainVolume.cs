@@ -15,40 +15,47 @@ using Cubiquity;
 public class ProceduralTerrainVolume : MonoBehaviour
 {
 	// Use this for initialization
-	void OnEnable()
+	void Start()
 	{
 		// The size of the volume we will generate
-		int width=512;
-		int height=64;
-		int depth=512;
+		int width = 256;
+		int height = 32;
+		int depth = 256;
 		
 		// FIXME - Where should we delete this?
 		TerrainVolumeData data = TerrainVolumeData.CreateEmptyVolumeData(new Region(0, 0, 0, width-1, height-1, depth-1));
 		
-		// Now we take the TerrainVolumeData we have just created and build a TerrainVolume from it.
-		// We also name it and make it a child of the generator to keep things tidy, though this isn't required.
-		// Lastly, the 'DontSave' flag is set because we simply regenerate the volume when switching to play mode.
-		GameObject terrain = TerrainVolume.CreateGameObject(data);
-		terrain.name = "Procedurally Generated Terrain";
-		terrain.transform.parent = transform;
-		terrain.hideFlags = HideFlags.DontSave;
+		TerrainVolume volume = GetComponent<TerrainVolume>();
+		TerrainVolumeRenderer volumeRenderer = GetComponent<TerrainVolumeRenderer>();
 		
-		// Set up our textures in the appropriate material slots.
-		terrain.GetComponent<TerrainVolume>().materials[0].diffuseMap = Resources.Load("Textures/Rock") as Texture2D;
-		terrain.GetComponent<TerrainVolume>().materials[0].scale = new Vector3(8.0f, 8.0f, 8.0f);		
-		terrain.GetComponent<TerrainVolume>().materials[1].diffuseMap = Resources.Load("Textures/Soil") as Texture2D;		
-		terrain.GetComponent<TerrainVolume>().materials[2].diffuseMap = Resources.Load("Textures/Grass") as Texture2D;
-		terrain.GetComponent<TerrainVolume>().materials[2].scale = new Vector3(1.0f, 1.0f, 1.0f);
+		volume.data = data;
+		
+		// Set up our material	
+		Material material = new Material(Shader.Find("TriplanarTexturing"));
+		volumeRenderer.material = material;
+		
+		// Set up the default textures
+		Texture2D rockTexture = Resources.Load("Textures/Rock") as Texture2D;
+		Texture2D soilTexture = Resources.Load("Textures/Soil") as Texture2D;
+		Texture2D grassTexture = Resources.Load("Textures/Grass") as Texture2D;
+		
+		//Assign the textures to the appropriate material slots.
+		material.SetTexture("_Tex0", rockTexture);
+		material.SetTextureScale("_Tex0", new Vector2(0.062f, 0.062f));
+		material.SetTexture("_Tex1", soilTexture);
+		material.SetTextureScale("_Tex1", new Vector2(0.125f, 0.125f));			
+		material.SetTexture("_Tex2", grassTexture);
+		material.SetTextureScale("_Tex2", new Vector2(0.125f, 0.125f));
 		
 		// At this point our volume is set up and ready to use. The remaining code is responsible
 		// for iterating over all the voxels and filling them according to our noise functions.
 		
 		// This scale factor comtrols the size of the rocks which are generated.
-		float rockScale = 16.0f;		
+		float rockScale = 32.0f;		
 		float invRockScale = 1.0f / rockScale;
 		
 		// Let's keep the allocation outside of the loop.
-		MaterialSet materialSet=new MaterialSet();
+		MaterialSet materialSet = new MaterialSet();
 		
 		// Iterate over every voxel of our volume
 		for(int z = 0; z < depth; z++)
@@ -69,12 +76,12 @@ public class ProceduralTerrainVolume : MonoBehaviour
 					
 					// Get the noise value for the current position.
 					// Returned value should be in the range -1 to +1.
-					float simplexNoiseValue=SimplexNoise.Noise.Generate(sampleX,sampleY,sampleZ);
+					float simplexNoiseValue = SimplexNoise.Noise.Generate(sampleX, sampleY, sampleZ);
 					
 					// We want to fade off the noise towards the top of the volume (so that the rocks don't go
 					// up to the sky) adn add extra material near the bottom of the volume (to create a floor).
 					// This altitude value is initially in the range from 0 to +1.
-					float altitude=(float)(y + 1)/(float)height;
+					float altitude = (float)(y + 1) / (float)height;
 					
 					// Map the altitude to the range -1.0 to +1.0...
 					altitude = (altitude * 2.0f) - 1.0f;

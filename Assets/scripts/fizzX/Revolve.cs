@@ -15,7 +15,6 @@ public class Revolve : MonoBehaviour
 	void Start () 
 	{
 		sun=GameObject.FindWithTag("");
-		center=sun.transform;
 		transform.position=(transform.position-center.position).normalized*
 			radius+center.position;
 		radius=2.0f;

@@ -43,18 +43,17 @@ public class ClickToDestroy : MonoBehaviour
 				// Build a ray based on the current mouse position
 				Vector2 mousePos = Input.mousePosition;
 				Ray ray = Camera.main.ScreenPointToRay(new Vector3(mousePos.x, mousePos.y, 0));
-				Vector3 dir = ray.direction * 1000.0f; //The maximum distance our ray will be cast.
 				
 				
 				// Perform the raycasting. If there's a hit the position will be stored in these ints.
-				int resultX, resultY, resultZ;
-				bool hit = ColoredCubesVolumePicking.PickFirstSolidVoxel(coloredCubesVolume, ray.origin.x, ray.origin.y, ray.origin.z, dir.x, dir.y, dir.z, out resultX, out resultY, out resultZ);
+				PickVoxelResult pickResult;
+				bool hit = Picking.PickFirstSolidVoxel(coloredCubesVolume, ray, 1000.0f, out pickResult);
 				
 				// If we hit a solid voxel then create an explosion at this point.
 				if(hit)
 				{					
-					int range = 5;
-					DestroyVoxels(resultX, resultY, resultZ, range);
+					int range = 2;
+					DestroyVoxels(pickResult.volumeSpacePos.x, pickResult.volumeSpacePos.y, pickResult.volumeSpacePos.z, range);
 				}
 				
 				// Set this flag so the click won't be processed again next frame.

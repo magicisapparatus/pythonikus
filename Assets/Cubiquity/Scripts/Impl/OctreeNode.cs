@@ -1,4 +1,9 @@
 ﻿using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 using System.Collections;
 using System.Text;
 
@@ -7,7 +12,7 @@ namespace Cubiquity
 	public class OctreeNode : MonoBehaviour
 	{
 		[System.NonSerialized]
-		public int meshLastSyncronised;
+		public uint meshLastSyncronised;
 		[System.NonSerialized]
 		public Vector3 lowerCorner;
 		[System.NonSerialized]
@@ -26,9 +31,6 @@ namespace Cubiquity
 			
 			GameObject newGameObject = new GameObject(name.ToString ());
 			newGameObject.AddComponent<OctreeNode>();
-			newGameObject.AddComponent<MeshFilter>();
-			newGameObject.AddComponent<MeshRenderer>();
-			newGameObject.AddComponent<MeshCollider>();
 			
 			OctreeNode octreeNode = newGameObject.GetComponent<OctreeNode>();
 			octreeNode.lowerCorner = new Vector3(xPos, yPos, zPos);
@@ -36,6 +38,8 @@ namespace Cubiquity
 			
 			if(parentGameObject)
 			{
+				newGameObject.layer = parentGameObject.layer;
+					
 				newGameObject.transform.parent = parentGameObject.transform;
 				newGameObject.transform.localPosition = new Vector3();
 				newGameObject.transform.localRotation = new Quaternion();
@@ -58,12 +62,12 @@ namespace Cubiquity
 				newGameObject.transform.localPosition = octreeNode.lowerCorner;
 			}
 			
-			newGameObject.hideFlags = HideFlags.HideAndDontSave;
+			newGameObject.hideFlags = HideFlags.HideInHierarchy;
 			
 			return newGameObject;
 		}
 		
-		public void syncNode(ref int availableNodeSyncs, bool UseCollisionMesh)
+		public void syncNode(ref int availableNodeSyncs, GameObject voxelTerrainGameObject)
 		{
 			if(availableNodeSyncs <= 0)
 			{
@@ -75,33 +79,62 @@ namespace Cubiquity
 			if(meshLastSyncronised < meshLastUpdated)
 			{			
 				if(CubiquityDLL.NodeHasMesh(nodeHandle) == 1)
-				{				
-					Mesh renderingMesh;
-					Mesh physicsMesh;
-					
-					BuildMeshFromNodeHandle(out renderingMesh, out physicsMesh, UseCollisionMesh);
-			
-			        MeshFilter mf = (MeshFilter)gameObject.GetComponent(typeof(MeshFilter));
-			        MeshRenderer mr = (MeshRenderer)gameObject.GetComponent(typeof(MeshRenderer));
-					
-					if(mf.sharedMesh != null)
-					{
-						DestroyImmediate(mf.sharedMesh);
+				{					
+					// Set up the rendering mesh
+					VolumeRenderer volumeRenderer = voxelTerrainGameObject.GetComponent<VolumeRenderer>();
+					if(volumeRenderer != null)
+					{						
+						Mesh renderingMesh = volumeRenderer.BuildMeshFromNodeHandle(nodeHandle);
+				
+				        MeshFilter meshFilter = gameObject.GetOrAddComponent<MeshFilter>() as MeshFilter;
+				        MeshRenderer meshRenderer = gameObject.GetOrAddComponent<MeshRenderer>() as MeshRenderer;
+						
+						if(meshFilter.sharedMesh != null)
+						{
+							DestroyImmediate(meshFilter.sharedMesh);
+						}
+						
+				        meshFilter.sharedMesh = renderingMesh;				
+						
+						meshRenderer.sharedMaterial = volumeRenderer.material;
+						
+						#if UNITY_EDITOR
+						EditorUtility.SetSelectedWireframeHidden(meshRenderer, true);
+						#endif
 					}
 					
-			        mf.sharedMesh = renderingMesh;				
-					
-					mr.material = new Material(Shader.Find("ColoredCubesVolume"));
-					
-					if(UseCollisionMesh)
+					// Set up the collision mesh
+					VolumeCollider volumeCollider = voxelTerrainGameObject.GetComponent<VolumeCollider>();					
+					if((volumeCollider != null) && (Application.isPlaying))
 					{
-						MeshCollider mc = (MeshCollider)gameObject.GetComponent(typeof(MeshCollider));
-						mc.sharedMesh = physicsMesh;
+						Mesh collisionMesh = volumeCollider.BuildMeshFromNodeHandle(nodeHandle);
+						MeshCollider meshCollider = gameObject.GetOrAddComponent<MeshCollider>() as MeshCollider;
+						meshCollider.sharedMesh = collisionMesh;
+					}
+				}
+				// If there is no mesh in Cubiquity then we make sure there isn't on in Unity.
+				else
+				{
+					MeshCollider meshCollider = gameObject.GetComponent<MeshCollider>() as MeshCollider;
+					if(meshCollider)
+					{
+						DestroyImmediate(meshCollider);
+					}
+					
+					MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>() as MeshRenderer;
+					if(meshRenderer)
+					{
+						DestroyImmediate(meshRenderer);
+					}
+					
+					MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>() as MeshFilter;
+					if(meshFilter)
+					{
+						DestroyImmediate(meshFilter);
 					}
 				}
 				
-				uint currentTime = CubiquityDLL.GetCurrentTime();
-				meshLastSyncronised = (int)(currentTime);
+				meshLastSyncronised = CubiquityDLL.GetCurrentTime();
 				availableNodeSyncs--;
 			}		
 			
@@ -129,58 +162,10 @@ namespace Cubiquity
 							//syncNode(childNodeHandle, childGameObject);
 							
 							OctreeNode childOctreeNode = childGameObject.GetComponent<OctreeNode>();
-							childOctreeNode.syncNode(ref availableNodeSyncs, UseCollisionMesh);
+							childOctreeNode.syncNode(ref availableNodeSyncs, voxelTerrainGameObject);
 						}
 					}
 				}
-			}
-		}
-		
-		void BuildMeshFromNodeHandle(out Mesh renderingMesh, out Mesh physicsMesh, bool UseCollisionMesh)
-		{
-			// At some point I should read this: http://forum.unity3d.com/threads/5687-C-plugin-pass-arrays-from-C
-			
-			// Create rendering and possible collision meshes.
-			renderingMesh = new Mesh();		
-			physicsMesh = UseCollisionMesh ? new Mesh() : null;
-			
-			// Get the data from Cubiquity.
-			int[] indices = CubiquityDLL.GetIndices(nodeHandle);		
-			CubiquityVertex[] cubiquityVertices = CubiquityDLL.GetVertices(nodeHandle);			
-			
-			// Create the arrays which we'll copy the data to.
-	        Vector3[] renderingVertices = new Vector3[cubiquityVertices.Length];	
-			Color32[] renderingColors = new Color32[cubiquityVertices.Length];
-			Vector3[] physicsVertices = UseCollisionMesh ? new Vector3[cubiquityVertices.Length] : null;
-			
-			for(int ct = 0; ct < cubiquityVertices.Length; ct++)
-			{
-				// Get the vertex data from Cubiquity.
-				Vector3 position = new Vector3(cubiquityVertices[ct].x, cubiquityVertices[ct].y, cubiquityVertices[ct].z);
-				QuantizedColor color = cubiquityVertices[ct].color;
-					
-				// Copy it to the arrays.
-				renderingVertices[ct] = position;
-				renderingColors[ct] = (Color32)color;
-				
-				if(UseCollisionMesh)
-				{
-					physicsVertices[ct] = position;
-				}
-			}
-			
-			// Assign vertex data to the meshes.
-			renderingMesh.vertices = renderingVertices; 
-			renderingMesh.colors32 = renderingColors;
-			renderingMesh.triangles = indices;
-			
-			// FIXME - Get proper bounds
-			renderingMesh.bounds = new Bounds(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(500.0f, 500.0f, 500.0f));
-			
-			//if(UseCollisionMesh)
-			{
-				physicsMesh.vertices = physicsVertices;
-				physicsMesh.triangles = indices;
 			}
 		}
 		
@@ -205,16 +190,5 @@ namespace Cubiquity
 			
 			children[x, y, z] = gameObject;
 		}
-		
-		/*public void OnDisable()
-		{
-			Debug.Log ("OctreeNode.OnDisable()");
-			gameObject.transform.parent = null;
-		}
-		
-		public void OnDestroy()
-		{
-			gameObject.transform.parent = null;
-		}*/
 	}
 }
