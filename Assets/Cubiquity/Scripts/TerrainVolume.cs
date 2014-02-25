@@ -43,7 +43,7 @@ namespace Cubiquity
 		void OnDrawGizmos()
 		{
 			// If there's no data then we don't need to (and can't?) draw the gizmos
-			if(data != null)
+			if(data!= null)
 			{
 				// Compute the size of the volume.
 				int width = (data.enclosingRegion.upperCorner.x - data.enclosingRegion.lowerCorner.x) + 1;

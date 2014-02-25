@@ -5,6 +5,7 @@ using Cubiquity;
 
 public class ClickToCarveTerrainVolume : MonoBehaviour
 {
+	public int pingas=1;
 	private TerrainVolume terrainVolume;
 	
 	// Bit of a hack - we want to detect mouse clicks rather than the mouse simply being down,
@@ -45,12 +46,13 @@ public class ClickToCarveTerrainVolume : MonoBehaviour
 				
 				// Perform the raycasting.
 				PickSurfaceResult pickResult;
-				bool hit = Picking.PickSurface(terrainVolume, ray, 1000.0f, out pickResult);
+				bool hit = Picking.PickSurface(terrainVolume, ray, 500.0f, out pickResult);
 				
 				// If we hit a solid voxel then create an explosion at this point.
+				//
 				if(hit)
 				{					
-					int range=2;
+					int range=pingas;
 					DestroyVoxels((int)pickResult.volumeSpacePos.x, (int)pickResult.volumeSpacePos.y, (int)pickResult.volumeSpacePos.z, range);
 				}
 				
