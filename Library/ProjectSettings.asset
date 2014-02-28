@@ -26,7 +26,7 @@ PlayerSettings:
   m_UseDX11: 0
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
-  displayResolutionDialog: 1
+  displayResolutionDialog: 2
   allowedAutorotateToPortrait: 1
   allowedAutorotateToPortraitUpsideDown: 1
   allowedAutorotateToLandscapeRight: 1
@@ -36,14 +36,14 @@ PlayerSettings:
   use24BitDepthBuffer: 0
   defaultIsFullScreen: 1
   defaultIsNativeResolution: 1
-  runInBackground: 0
-  captureSingleScreen: 0
+  runInBackground: 1
+  captureSingleScreen: 1
   Override IPod Music: 0
   Prepare IOS For Recording: 0
   enableHWStatistics: 1
   usePlayerLog: 1
   stripPhysics: 0
-  forceSingleInstance: 1
+  forceSingleInstance: 0
   resizableWindow: 1
   useMacAppStoreValidation: 1
   gpuSkinning: 1
@@ -82,7 +82,7 @@ PlayerSettings:
   AndroidMinSdkVersion: 9
   AndroidPreferredInstallLocation: 1
   aotOptions: 
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
   ForceInternetPermission: 0
@@ -129,7 +129,7 @@ PlayerSettings:
       m_Size: 48
     - m_Icon: {fileID: 0}
       m_Size: 32
-    - m_Icon: {fileID: 2800000, guid: a5f033db74c5d7345867f76a7186bd53, type: 3}
+    - m_Icon: {fileID: 2800000, guid: d869cbffb06140f45bf2663b52405b9c, type: 3}
       m_Size: 16
   m_BuildTargetBatching:
   - m_BuildTarget: Standalone

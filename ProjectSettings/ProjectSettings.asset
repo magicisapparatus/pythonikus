@@ -129,7 +129,7 @@ PlayerSettings:
       m_Size: 48
     - m_Icon: {fileID: 0}
       m_Size: 32
-    - m_Icon: {fileID: 2800000, guid: a5f033db74c5d7345867f76a7186bd53, type: 3}
+    - m_Icon: {fileID: 2800000, guid: d869cbffb06140f45bf2663b52405b9c, type: 3}
       m_Size: 16
   m_BuildTargetBatching:
   - m_BuildTarget: Standalone
