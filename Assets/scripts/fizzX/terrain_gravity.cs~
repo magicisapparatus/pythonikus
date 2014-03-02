@@ -28,6 +28,5 @@ public class terrain_gravity : MonoBehaviour
 				Item_transform.position.z
 				)
 			);
-
 	}
 }

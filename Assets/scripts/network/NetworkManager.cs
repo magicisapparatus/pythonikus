@@ -35,7 +35,7 @@ public class NetworkManager : MonoBehaviour
 	{
 		Debug.Log("refreshing bra...");
 		MasterServer.RequestHostList(registeredName);
-		float timeEnd=Time.time+refreshRequestLength;;
+		float timeEnd=Time.time+refreshRequestLength;
 
 		while(Time.time<timeEnd)
 		{
@@ -60,7 +60,7 @@ public class NetworkManager : MonoBehaviour
 		return;
 
 
-		if(GUI.Button(new Rect(25f,25f,150f,30f),"start new server"))
+		if(GUI.Button(new Rect(25,25,150,30),"start new server"))
 		   {
 			//server function goes here
 			StartServer();
@@ -68,12 +68,9 @@ public class NetworkManager : MonoBehaviour
 
 		if(GUI.Button(new Rect(25f,65f,150f,30f),"refresh"))
 		{
-
-
-
 			//y'know, for a refresh button
 			StartCoroutine("RefreshHostList");
-			}
+		}
 
 		for(ServerCount=0; ServerCount<hostData.Length; ServerCount++)
 		{
