@@ -15,8 +15,10 @@ namespace Cubiquity
 	}
 	
 	/**
-	 * This structure is used to return the result of picking the surface of the volume, rather than picking the underlying
-	 * voxels. The voxels themselves are always on integer positions in volume space, but the generated surface usually
+	 * This structure is used to return the result of picking the surface of the volume, 
+	 * rather than picking the underlying
+	 * voxels. The voxels themselves are always on integer positions in volume space
+	 * but the generated surface usually
 	 * passes *between* voxels. Therefore both the volume space and world space positions are provided as floating point values.
 	 */
 	public struct PickSurfaceResult

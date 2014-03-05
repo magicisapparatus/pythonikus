@@ -1,0 +1,19 @@
+********************************************************************************
+*                             Initializing Cubiquity                           *
+********************************************************************************
+[15:43:07, Info   ]: Creating VoxelDatabase from 'C:/Users/gabe2_000/Dropbox/unity/pythonikus/Assets/StreamingAssets\68614473.vdb'
+[15:43:07, Info   ]: Successfully opened'C:/Users/gabe2_000/Dropbox/unity/pythonikus/Assets/StreamingAssets\68614473.vdb'
+[15:43:07, Debug  ]: The maximum number of uncompresed blocks has been set to 64, which is 16777216 bytes
+[15:43:07, Debug  ]: Created new smooth volume in slot 0
+[15:43:07, Info   ]: Creating VoxelDatabase from 'C:/Users/gabe2_000/Dropbox/unity/pythonikus/Assets/StreamingAssets\28404AF3.vdb'
+[15:43:07, Info   ]: Successfully opened'C:/Users/gabe2_000/Dropbox/unity/pythonikus/Assets/StreamingAssets\28404AF3.vdb'
+[15:43:07, Debug  ]: The maximum number of uncompresed blocks has been set to 64, which is 16777216 bytes
+[15:43:07, Debug  ]: Created new smooth volume in slot 1
+[16:13:55, Info   ]: Resizing temp buffer to 65536bytes. This should only happen the first time the MinizBlockCompressor is used
+[16:13:55, Debug  ]: In cuDeleteTerrainVolume() - deleting volume handle '1'
+[16:13:55, Info   ]: Resizing temp buffer to 65536bytes. This should only happen the first time the MinizBlockCompressor is used
+[16:13:55, Debug  ]: In cuDeleteTerrainVolume() - deleting volume handle '0'
+********************************************************************************
+*                             Shutting down Cubiquity                          *
+********************************************************************************
+

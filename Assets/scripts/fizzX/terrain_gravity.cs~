@@ -1,32 +1,54 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using Cubiquity;
+
 public class terrain_gravity : MonoBehaviour
 {
 	public GameObject Item;
-	public Rigidbody Item_rigidbody;
-	public Transform Item_transform;
+	public float Range=35000f;
 	private Ray Lulz;
+	private RaycastHit hitObject;
+	private TerrainVolume terrainVolume;
 
 	// Use this for initialization lulz
 	void Start ()
 	{
-		Item_rigidbody.useGravity=false;
+		Item.rigidbody.useGravity=false;
 	}
 	
 	// Update is called once per frame i <3 this thingy
 	void Update ()
 	{
 		//this is to check if the terrain is near (underneath was the plan but why not near eh?
-		Lulz.origin=(Item_transform.position);
+		Lulz.origin=(Item.transform.position);
 		Lulz.direction=
 			(
 				new Vector3
 				(
-				Item_transform.position.x,
-				Item_transform.position.y-2,
-				Item_transform.position.z
+				Item.transform.position.x,
+				Item.transform.position.y-10,
+				Item.transform.position.z
 				)
 			);
+		//this ends the part getting the ray where it will check if its over
+		//the things with the terrain voxels
+
+
+		// Perform the raycasting.
+		PickSurfaceResult pickResult;
+		bool hit=Picking.PickSurface(terrainVolume,Lulz,Range,out pickResult);
+		
+		// If we hit a solid voxel then enable the gravity
+		
+		if(hit)
+		{
+			Item.rigidbody.useGravity=true;
+		}
+
+		else
+		{
+			Item.rigidbody.useGravity=false;
+		}
 	}
 }
