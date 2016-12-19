@@ -1,7 +1,7 @@
 pythonikus
 ==========
 
-oh no, I have transformed into a goot
+A game like no mans sky but like minecraft and it will actually be multiplayer I promise
 
 oh its a game, chances are if your here 
 A) your a really nice and curious person I'd like to meet or
